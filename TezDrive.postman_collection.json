@@ -15,6 +15,11 @@
       "key": "token",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "rideId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -182,6 +187,83 @@
               "raw": "{{baseUrl}}/api/auth/login",
               "host": ["{{baseUrl}}"],
               "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ride Offers",
+      "item": [
+        {
+          "name": "Create Ride (Driver)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json.id) {",
+                  "    pm.collectionVariables.set('rideId', json.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromCity\": \"Bishkek\",\n  \"toCity\": \"Osh\",\n  \"departureTime\": \"2026-06-01T08:00:00\",\n  \"availableSeats\": 3,\n  \"pricePerSeat\": 500.00,\n  \"notes\": \"Comfortable ride, no smoking\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/rides",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rides"]
+            }
+          }
+        },
+        {
+          "name": "My Rides (Driver)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/rides/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rides", "my"]
+            }
+          }
+        },
+        {
+          "name": "Get Ride By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/rides/{{rideId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rides", "{{rideId}}"]
+            }
+          }
+        },
+        {
+          "name": "Search Rides (Passenger)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/rides/search?fromCity=Bishkek&toCity=Osh&date=2026-06-01&minSeats=1&maxPrice=600",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rides", "search"],
+              "query": [
+                { "key": "fromCity", "value": "Bishkek" },
+                { "key": "toCity", "value": "Osh" },
+                { "key": "date", "value": "2026-06-01" },
+                { "key": "minSeats", "value": "1" },
+                { "key": "maxPrice", "value": "600" }
+              ]
             }
           }
         }
