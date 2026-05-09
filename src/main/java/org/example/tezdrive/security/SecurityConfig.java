@@ -48,6 +48,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/api/rides/search", "/api/rides/{id}", "/api/users/drivers/{driverId}").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
