@@ -5,6 +5,7 @@ import org.example.tezdrive.dto.user.UpdateProfileRequest;
 import org.example.tezdrive.dto.user.UserProfileResponse;
 import org.example.tezdrive.entity.User;
 import org.example.tezdrive.repository.UserRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final CarService carService;
+    private final CommentService commentService;
 
     public UserProfileResponse getProfile(User user) {
         return toResponse(user);
@@ -47,6 +49,7 @@ public class UserService {
                 .rating(user.getRating())
                 .ratingCount(user.getRatingCount())
                 .cars(carService.getDriverCars(user.getId()))
+                .comments(commentService.getCommentsForDriver(user.getId()))
                 .build();
     }
 }

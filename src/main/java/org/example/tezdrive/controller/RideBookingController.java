@@ -5,8 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.example.tezdrive.dto.booking.BookingRequest;
 import org.example.tezdrive.dto.booking.BookingResponse;
 import org.example.tezdrive.dto.booking.RateRequest;
+import org.example.tezdrive.dto.comment.CommentRequest;
+import org.example.tezdrive.dto.comment.CommentResponse;
 import org.example.tezdrive.entity.User;
 import org.example.tezdrive.security.UserPrincipal;
+import org.example.tezdrive.service.CommentService;
 import org.example.tezdrive.service.RideBookingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +24,7 @@ import java.util.List;
 public class RideBookingController {
 
     private final RideBookingService bookingService;
+    private final CommentService commentService;
 
     // ---- Passenger: request a booking ----
     @PostMapping("/rides/{rideId}/bookings")
@@ -86,5 +90,16 @@ public class RideBookingController {
             @Valid @RequestBody RateRequest request
     ) {
         return ResponseEntity.ok(bookingService.rateBooking(principal.getUser(), bookingId, request));
+    }
+
+    // ---- Passenger: leave a comment for the driver ----
+    @PostMapping("/bookings/{bookingId}/comment")
+    public ResponseEntity<CommentResponse> comment(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long bookingId,
+            @Valid @RequestBody CommentRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(commentService.addComment(principal.getUser(), bookingId, request));
     }
 }
