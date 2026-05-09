@@ -26,7 +26,7 @@ public class CommentService {
 
     @Transactional
     public CommentResponse addComment(User passenger, Long bookingId, CommentRequest request) {
-        if (passenger.getRole() != Role.USER) {
+        if (passenger.getRole() != Role.PASSENGER) {
             throw new AccessDeniedException("Only passengers can leave comments");
         }
         RideBooking booking = bookingRepository.findByIdAndPassengerId(bookingId, passenger.getId())

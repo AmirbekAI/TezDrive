@@ -24,7 +24,7 @@ public class RideBookingService {
 
     @Transactional
     public BookingResponse requestBooking(User passenger, Long rideId, BookingRequest request) {
-        if (passenger.getRole() != Role.USER) {
+        if (passenger.getRole() != Role.PASSENGER) {
             throw new AccessDeniedException("Only passengers can request bookings");
         }
         RideOffer ride = rideOfferService.findById(rideId);
@@ -93,7 +93,7 @@ public class RideBookingService {
 
     @Transactional
     public BookingResponse cancelBooking(User passenger, Long bookingId) {
-        if (passenger.getRole() != Role.USER) {
+        if (passenger.getRole() != Role.PASSENGER) {
             throw new AccessDeniedException("Only passengers can cancel bookings");
         }
         RideBooking booking = bookingRepository.findByIdAndPassengerId(bookingId, passenger.getId())
@@ -135,7 +135,7 @@ public class RideBookingService {
 
     @Transactional
     public BookingResponse rateBooking(User passenger, Long bookingId, RateRequest request) {
-        if (passenger.getRole() != Role.USER) {
+        if (passenger.getRole() != Role.PASSENGER) {
             throw new AccessDeniedException("Only passengers can rate rides");
         }
         RideBooking booking = bookingRepository.findByIdAndPassengerId(bookingId, passenger.getId())
