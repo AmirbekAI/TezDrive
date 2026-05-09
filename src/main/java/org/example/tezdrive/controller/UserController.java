@@ -9,6 +9,9 @@ import org.example.tezdrive.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/users")
@@ -30,6 +33,15 @@ public class UserController {
             @RequestBody UpdateProfileRequest request
     ) {
         return ResponseEntity.ok(userService.updateProfile(principal.getUser(), request));
+    }
+
+    // ---- Upload / replace profile photo ----
+    @PostMapping("/me/photo")
+    public ResponseEntity<UserProfileResponse> uploadPhoto(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        return ResponseEntity.ok(userService.uploadProfilePhoto(principal.getUser(), file));
     }
 
     // ---- View any driver's public profile ----

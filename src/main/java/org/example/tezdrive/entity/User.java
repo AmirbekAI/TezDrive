@@ -38,4 +38,7 @@ public class User {
 
     @Column(nullable = false)
     private int ratingCount = 0;
+
+    @Column
+    private String photoUrl;
 }

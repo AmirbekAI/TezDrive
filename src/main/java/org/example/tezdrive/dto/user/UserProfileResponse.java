@@ -18,6 +18,7 @@ public class UserProfileResponse {
     private String phone;
     private double rating;
     private int ratingCount;
+    private String photoUrl;
     private List<CarResponse> cars;
     private List<CommentResponse> comments;
 }
