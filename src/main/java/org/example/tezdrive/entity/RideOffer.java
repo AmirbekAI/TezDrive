@@ -41,6 +41,10 @@ public class RideOffer {
     @Column
     private String notes;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "car_id")
+    private Car car;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RideStatus status;

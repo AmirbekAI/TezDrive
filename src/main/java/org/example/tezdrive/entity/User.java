@@ -32,13 +32,6 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    // Driver-specific fields
-    @Column
-    private String carModel;
-
-    @Column
-    private String carDescription;
-
     // Computed rating (updated on each new rating)
     @Column(nullable = false)
     private double rating = 0.0;

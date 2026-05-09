@@ -5,6 +5,7 @@ import org.example.tezdrive.dto.ride.CreateRideRequest;
 import org.example.tezdrive.dto.ride.RideOfferResponse;
 import org.example.tezdrive.dto.ride.RideSearchRequest;
 import org.example.tezdrive.entity.BookingStatus;
+import org.example.tezdrive.entity.Car;
 import org.example.tezdrive.entity.RideBooking;
 import org.example.tezdrive.entity.RideOffer;
 import org.example.tezdrive.entity.RideStatus;
@@ -27,11 +28,16 @@ public class RideOfferService {
 
     private final RideOfferRepository rideOfferRepository;
     private final RideBookingRepository bookingRepository;
+    private final CarService carService;
 
     @Transactional
     public RideOfferResponse create(User driver, CreateRideRequest request) {
         if (driver.getRole() != Role.DRIVER) {
             throw new AccessDeniedException("Only drivers can create ride offers");
+        }
+        Car car = null;
+        if (request.getCarId() != null) {
+            car = carService.findByIdAndDriver(request.getCarId(), driver.getId());
         }
         RideOffer ride = RideOffer.builder()
                 .driver(driver)
@@ -41,6 +47,7 @@ public class RideOfferService {
                 .availableSeats(request.getAvailableSeats())
                 .pricePerSeat(request.getPricePerSeat())
                 .notes(request.getNotes())
+                .car(car)
                 .status(RideStatus.ACTIVE)
                 .build();
 
@@ -134,6 +141,7 @@ public class RideOfferService {
                 .pricePerSeat(ride.getPricePerSeat())
                 .notes(ride.getNotes())
                 .status(ride.getStatus())
+                .car(ride.getCar() != null ? carService.toResponse(ride.getCar()) : null)
                 .build();
     }
 }

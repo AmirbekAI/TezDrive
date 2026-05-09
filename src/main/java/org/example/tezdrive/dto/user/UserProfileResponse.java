@@ -2,7 +2,10 @@ package org.example.tezdrive.dto.user;
 
 import lombok.Builder;
 import lombok.Data;
+import org.example.tezdrive.dto.car.CarResponse;
 import org.example.tezdrive.entity.Role;
+
+import java.util.List;
 
 @Data
 @Builder
@@ -14,4 +17,5 @@ public class UserProfileResponse {
     private String phone;
     private double rating;
     private int ratingCount;
+    private List<CarResponse> cars;
 }

@@ -2,6 +2,7 @@ package org.example.tezdrive.dto.ride;
 
 import lombok.Builder;
 import lombok.Data;
+import org.example.tezdrive.dto.car.CarResponse;
 import org.example.tezdrive.entity.RideStatus;
 
 import java.math.BigDecimal;
@@ -23,4 +24,5 @@ public class RideOfferResponse {
     private BigDecimal pricePerSeat;
     private String notes;
     private RideStatus status;
+    private CarResponse car;
 }

@@ -30,6 +30,11 @@
       "key": "bookingId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "carId",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
@@ -285,7 +290,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"fromCity\": \"Bishkek\",\n  \"toCity\": \"Osh\",\n  \"departureTime\": \"2026-06-01T08:00:00\",\n  \"availableSeats\": 3,\n  \"pricePerSeat\": 500.00,\n  \"notes\": \"Comfortable ride, no smoking\"\n}"
+              "raw": "{\n  \"fromCity\": \"Bishkek\",\n  \"toCity\": \"Osh\",\n  \"departureTime\": \"2026-06-01T08:00:00\",\n  \"availableSeats\": 3,\n  \"pricePerSeat\": 500.00,\n  \"notes\": \"Comfortable ride, no smoking\",\n  \"carId\": null\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/rides",
@@ -686,6 +691,125 @@
                 "{{bookingId}}",
                 "rate"
               ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "My Profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{driverToken}}", "type": "string"}]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update My Profile (Driver)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{driverToken}}", "type": "string"}]
+            },
+            "method": "PATCH",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Aziz Karimov Updated\",\n  \"phone\": \"+996700999888\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "me"]
+            }
+          }
+        },
+        {
+          "name": "View Driver Profile (Public)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{passengerToken}}", "type": "string"}]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/users/drivers/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "drivers", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cars",
+      "item": [
+        {
+          "name": "Add Car (Driver)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": ["var json = pm.response.json(); if (json.id) pm.collectionVariables.set('carId', json.id);"],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{driverToken}}", "type": "string"}]
+            },
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"make\": \"Toyota\",\n  \"model\": \"Camry\",\n  \"year\": 2020,\n  \"color\": \"White\",\n  \"plateNumber\": \"B 123 KG\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars"]
+            }
+          }
+        },
+        {
+          "name": "My Cars (Driver)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{driverToken}}", "type": "string"}]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/my",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "my"]
+            }
+          }
+        },
+        {
+          "name": "Delete Car (Driver)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{driverToken}}", "type": "string"}]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{carId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "{{carId}}"]
             }
           }
         }

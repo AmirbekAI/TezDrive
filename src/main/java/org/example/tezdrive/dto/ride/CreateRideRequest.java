@@ -27,4 +27,6 @@ public class CreateRideRequest {
     private BigDecimal pricePerSeat;
 
     private String notes;
+
+    private Long carId;
 }
