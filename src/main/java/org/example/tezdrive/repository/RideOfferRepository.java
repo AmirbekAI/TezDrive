@@ -25,7 +25,7 @@ public interface RideOfferRepository extends JpaRepository<RideOffer, Long> {
               AND r.departureTime < :dateTo
               AND r.availableSeats >= :minSeats
               AND r.pricePerSeat <= :maxPrice
-            ORDER BY r.departureTime ASC
+            ORDER BY r.driver.rating DESC, r.departureTime ASC
             """)
     List<RideOffer> search(
             @Param("fromCity") String fromCity,

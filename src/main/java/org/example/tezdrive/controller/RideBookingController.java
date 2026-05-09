@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.tezdrive.dto.booking.BookingRequest;
 import org.example.tezdrive.dto.booking.BookingResponse;
+import org.example.tezdrive.dto.booking.RateRequest;
 import org.example.tezdrive.entity.User;
 import org.example.tezdrive.security.UserPrincipal;
 import org.example.tezdrive.service.RideBookingService;
@@ -75,5 +76,15 @@ public class RideBookingController {
             @PathVariable Long bookingId
     ) {
         return ResponseEntity.ok(bookingService.rejectBooking(principal.getUser(), bookingId));
+    }
+
+    // ---- Passenger: rate a finished ride ----
+    @PatchMapping("/bookings/{bookingId}/rate")
+    public ResponseEntity<BookingResponse> rate(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long bookingId,
+            @Valid @RequestBody RateRequest request
+    ) {
+        return ResponseEntity.ok(bookingService.rateBooking(principal.getUser(), bookingId, request));
     }
 }

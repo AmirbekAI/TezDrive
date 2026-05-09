@@ -4,11 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.example.tezdrive.dto.ride.CreateRideRequest;
 import org.example.tezdrive.dto.ride.RideOfferResponse;
 import org.example.tezdrive.dto.ride.RideSearchRequest;
+import org.example.tezdrive.entity.BookingStatus;
+import org.example.tezdrive.entity.RideBooking;
 import org.example.tezdrive.entity.RideOffer;
 import org.example.tezdrive.entity.RideStatus;
 import org.example.tezdrive.entity.Role;
 import org.example.tezdrive.entity.User;
 import org.example.tezdrive.exception.AccessDeniedException;
+import org.example.tezdrive.repository.RideBookingRepository;
 import org.example.tezdrive.repository.RideOfferRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,7 @@ import java.util.List;
 public class RideOfferService {
 
     private final RideOfferRepository rideOfferRepository;
+    private final RideBookingRepository bookingRepository;
 
     @Transactional
     public RideOfferResponse create(User driver, CreateRideRequest request) {
@@ -73,6 +77,47 @@ public class RideOfferService {
     public RideOffer findById(Long id) {
         return rideOfferRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Ride not found: " + id));
+    }
+
+    @Transactional
+    public RideOfferResponse startRide(User driver, Long rideId) {
+        if (driver.getRole() != Role.DRIVER) {
+            throw new AccessDeniedException("Only drivers can start rides");
+        }
+        RideOffer ride = findById(rideId);
+        if (!ride.getDriver().getId().equals(driver.getId())) {
+            throw new IllegalArgumentException("Ride not found");
+        }
+        if (ride.getStatus() != RideStatus.ACTIVE) {
+            throw new IllegalStateException("Ride is not in ACTIVE status");
+        }
+        List<RideBooking> acceptedBookings = bookingRepository.findByRideIdAndStatus(rideId, BookingStatus.ACCEPTED);
+        if (acceptedBookings.isEmpty()) {
+            throw new IllegalStateException("Cannot start a ride with no accepted bookings");
+        }
+        ride.setStatus(RideStatus.STARTED);
+        acceptedBookings.forEach(b -> b.setStatus(BookingStatus.IN_RIDE));
+        bookingRepository.saveAll(acceptedBookings);
+        return toResponse(rideOfferRepository.save(ride));
+    }
+
+    @Transactional
+    public RideOfferResponse finishRide(User driver, Long rideId) {
+        if (driver.getRole() != Role.DRIVER) {
+            throw new AccessDeniedException("Only drivers can finish rides");
+        }
+        RideOffer ride = findById(rideId);
+        if (!ride.getDriver().getId().equals(driver.getId())) {
+            throw new IllegalArgumentException("Ride not found");
+        }
+        if (ride.getStatus() != RideStatus.STARTED) {
+            throw new IllegalStateException("Ride is not in STARTED status");
+        }
+        ride.setStatus(RideStatus.COMPLETED);
+        List<RideBooking> inRideBookings = bookingRepository.findByRideIdAndStatus(rideId, BookingStatus.IN_RIDE);
+        inRideBookings.forEach(b -> b.setStatus(BookingStatus.FINISHED));
+        bookingRepository.saveAll(inRideBookings);
+        return toResponse(rideOfferRepository.save(ride));
     }
 
     public RideOfferResponse toResponse(RideOffer ride) {

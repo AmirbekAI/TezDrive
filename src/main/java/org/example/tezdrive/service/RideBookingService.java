@@ -3,9 +3,11 @@ package org.example.tezdrive.service;
 import lombok.RequiredArgsConstructor;
 import org.example.tezdrive.dto.booking.BookingRequest;
 import org.example.tezdrive.dto.booking.BookingResponse;
+import org.example.tezdrive.dto.booking.RateRequest;
 import org.example.tezdrive.entity.*;
 import org.example.tezdrive.exception.AccessDeniedException;
 import org.example.tezdrive.repository.RideBookingRepository;
+import org.example.tezdrive.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,7 @@ public class RideBookingService {
 
     private final RideBookingRepository bookingRepository;
     private final RideOfferService rideOfferService;
+    private final UserRepository userRepository;
 
     @Transactional
     public BookingResponse requestBooking(User passenger, Long rideId, BookingRequest request) {
@@ -128,6 +131,35 @@ public class RideBookingService {
         return bookingRepository.findByPassengerId(passenger.getId()).stream()
                 .map(b -> toResponse(b, passenger.getId()))
                 .toList();
+    }
+
+    @Transactional
+    public BookingResponse rateBooking(User passenger, Long bookingId, RateRequest request) {
+        if (passenger.getRole() != Role.USER) {
+            throw new AccessDeniedException("Only passengers can rate rides");
+        }
+        RideBooking booking = bookingRepository.findByIdAndPassengerId(bookingId, passenger.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+
+        if (booking.getStatus() != BookingStatus.FINISHED) {
+            throw new IllegalStateException("You can only rate completed rides");
+        }
+        if (booking.getRating() != null) {
+            throw new IllegalStateException("You have already rated this ride");
+        }
+
+        booking.setRating(request.getRating());
+        bookingRepository.save(booking);
+
+        // Update driver rolling average
+        User driver = booking.getRide().getDriver();
+        double newRating = (driver.getRating() * driver.getRatingCount() + request.getRating())
+                / (driver.getRatingCount() + 1);
+        driver.setRating(newRating);
+        driver.setRatingCount(driver.getRatingCount() + 1);
+        userRepository.save(driver);
+
+        return toResponse(booking, passenger.getId());
     }
 
     private RideBooking findBookingForDriver(Long driverId, Long bookingId) {

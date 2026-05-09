@@ -53,4 +53,22 @@ public class RideOfferController {
     public ResponseEntity<RideOfferResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(rideOfferService.getById(id));
     }
+
+    // ---- Driver: ride lifecycle ----
+
+    @PatchMapping("/{rideId}/start")
+    public ResponseEntity<RideOfferResponse> startRide(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long rideId
+    ) {
+        return ResponseEntity.ok(rideOfferService.startRide(principal.getUser(), rideId));
+    }
+
+    @PatchMapping("/{rideId}/finish")
+    public ResponseEntity<RideOfferResponse> finishRide(
+            @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable Long rideId
+    ) {
+        return ResponseEntity.ok(rideOfferService.finishRide(principal.getUser(), rideId));
+    }
 }
