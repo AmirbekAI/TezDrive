@@ -850,6 +850,68 @@
               "path": ["api", "cars", "{{carId}}"]
             }
           }
+        },
+        {
+          "name": "Upload Car Photo (Driver)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{driverToken}}", "type": "string"}]
+            },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "file", "type": "file", "src": ""}
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/{{carId}}/photos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "{{carId}}", "photos"]
+            }
+          }
+        },
+        {
+          "name": "Delete Car Photo (Driver)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{driverToken}}", "type": "string"}]
+            },
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/cars/photos/{{photoId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cars", "photos", "{{photoId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile Photos",
+      "item": [
+        {
+          "name": "Upload Profile Photo (Driver)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{"key": "token", "value": "{{driverToken}}", "type": "string"}]
+            },
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {"key": "file", "type": "file", "src": ""}
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me/photo",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "me", "photo"]
+            }
+          }
         }
       ]
     }
