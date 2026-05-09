@@ -6,7 +6,9 @@ import org.example.tezdrive.dto.ride.RideOfferResponse;
 import org.example.tezdrive.dto.ride.RideSearchRequest;
 import org.example.tezdrive.entity.RideOffer;
 import org.example.tezdrive.entity.RideStatus;
+import org.example.tezdrive.entity.Role;
 import org.example.tezdrive.entity.User;
+import org.example.tezdrive.exception.AccessDeniedException;
 import org.example.tezdrive.repository.RideOfferRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +26,9 @@ public class RideOfferService {
 
     @Transactional
     public RideOfferResponse create(User driver, CreateRideRequest request) {
+        if (driver.getRole() != Role.DRIVER) {
+            throw new AccessDeniedException("Only drivers can create ride offers");
+        }
         RideOffer ride = RideOffer.builder()
                 .driver(driver)
                 .fromCity(request.getFromCity())
@@ -38,8 +43,11 @@ public class RideOfferService {
         return toResponse(rideOfferRepository.save(ride));
     }
 
-    public List<RideOfferResponse> getMyRides(Long driverId) {
-        return rideOfferRepository.findByDriverIdOrderByDepartureTimeDesc(driverId)
+    public List<RideOfferResponse> getMyRides(User driver) {
+        if (driver.getRole() != Role.DRIVER) {
+            throw new AccessDeniedException("Only drivers can view their ride offers");
+        }
+        return rideOfferRepository.findByDriverIdOrderByDepartureTimeDesc(driver.getId())
                 .stream().map(this::toResponse).toList();
     }
 

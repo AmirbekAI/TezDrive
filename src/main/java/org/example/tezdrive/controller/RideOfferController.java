@@ -10,7 +10,6 @@ import org.example.tezdrive.security.UserPrincipal;
 import org.example.tezdrive.service.RideOfferService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +25,6 @@ public class RideOfferController {
     // ---- Driver endpoints ----
 
     @PostMapping
-    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<RideOfferResponse> create(
             @AuthenticationPrincipal UserPrincipal principal,
             @Valid @RequestBody CreateRideRequest request
@@ -36,17 +34,15 @@ public class RideOfferController {
     }
 
     @GetMapping("/my")
-    @PreAuthorize("hasRole('DRIVER')")
     public ResponseEntity<List<RideOfferResponse>> myRides(
             @AuthenticationPrincipal UserPrincipal principal
     ) {
-        return ResponseEntity.ok(rideOfferService.getMyRides(principal.getUser().getId()));
+        return ResponseEntity.ok(rideOfferService.getMyRides(principal.getUser()));
     }
 
     // ---- Passenger endpoints ----
 
     @GetMapping("/search")
-    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<List<RideOfferResponse>> search(
             @Valid @ModelAttribute RideSearchRequest request
     ) {
